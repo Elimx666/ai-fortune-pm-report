@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI 算命 / 灵性自我探索产品市场可行性报告</title>
+  <style>
+    :root {
+      --bg: #f6f9ff;
+      --surface: #ffffff;
+      --surface-2: #f0f6ff;
+      --ink: #102033;
+      --muted: #5f6f86;
+      --line: #d9e6f7;
+      --blue: #1769e0;
+      --blue-2: #0f8fd6;
+      --blue-3: #e8f2ff;
+      --deep: #0b2f66;
+      --good: #14825f;
+      --warn: #b96b18;
+      --bad: #bf3f4a;
+      --shadow: 0 18px 50px rgba(20, 83, 158, .11);
+      --sidebar: 292px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 86% 3%, rgba(23,105,224,.12), transparent 24%),
+        linear-gradient(180deg, #fbfdff 0%, var(--bg) 520px, #f8fbff 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.68;
+      font-size: 15px;
+    }
+
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.06; letter-spacing: -.04em; color: #07192e; }
+    h2 { font-size: 26px; line-height: 1.22; letter-spacing: -.02em; margin-bottom: 18px; }
+    h3 { font-size: 17px; line-height: 1.28; margin-bottom: 10px; }
+    p + p { margin-top: 10px; }
+    strong { font-weight: 750; }
+
+    .app-shell { display: grid; grid-template-columns: var(--sidebar) 1fr; min-height: 100vh; transition: grid-template-columns .24s ease; }
+    body.sidebar-collapsed { --sidebar: 76px; }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      border-right: 1px solid var(--line);
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(18px);
+      padding: 18px 14px;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .doc-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 8px 8px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, var(--blue), #75b8ff);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      box-shadow: 0 10px 22px rgba(23,105,224,.22);
+      flex: 0 0 auto;
+    }
+    .brand-text { min-width: 0; transition: opacity .16s ease; }
+    .brand-text b { display: block; font-size: 14px; line-height: 1.2; }
+    .brand-text span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    body.sidebar-collapsed .brand-text, body.sidebar-collapsed .toc-text, body.sidebar-collapsed .sidebar-meta { opacity: 0; pointer-events: none; }
+
+    .toggle-btn {
+      width: 100%;
+      height: 36px;
+      margin: 14px 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--deep);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .toc-list { margin: 8px 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+    .toc-list a {
+      min-height: 38px;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      color: #31445c;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .toc-list a:hover, .toc-list a.active { background: var(--blue-3); color: var(--blue); }
+    .toc-index {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      background: #eef5ff;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .sidebar-meta {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #f8fbff;
+      color: var(--muted);
+      font-size: 12px;
+      transition: opacity .16s ease;
+    }
+
+    .main { min-width: 0; padding: 28px clamp(18px, 4vw, 56px) 72px; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin: 0 auto 22px;
+      max-width: 1180px;
+    }
+    .crumb { color: var(--muted); font-size: 13px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid rgba(23,105,224,.22);
+      background: var(--surface);
+      color: var(--blue);
+      border-radius: 999px;
+      padding: 8px 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(23,105,224,.06);
+    }
+    .btn.primary { background: var(--blue); color: #fff; }
+
+    .report { max-width: 1180px; margin: 0 auto; display: grid; gap: 22px; }
+    .section, .hero {
+      background: rgba(255,255,255,.92);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 4vw, 42px);
+      scroll-margin-top: 26px;
+    }
+    .hero {
+      min-height: 440px;
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 30px;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 460px;
+      height: 460px;
+      right: -160px;
+      top: -130px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(23,105,224,.18), transparent 66%);
+      pointer-events: none;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--blue);
+      background: var(--blue-3);
+      border: 1px solid rgba(23,105,224,.16);
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .subtitle { margin-top: 18px; font-size: 18px; color: var(--muted); max-width: 760px; }
+
+    .hero-panel {
+      position: relative;
+      z-index: 1;
+      border-radius: 24px;
+      padding: 22px;
+      background: linear-gradient(180deg, #f3f8ff, #ffffff);
+      border: 1px solid var(--line);
+    }
+    .score-ring {
+      width: 188px;
+      height: 188px;
+      border-radius: 50%;
+      margin: 0 auto 18px;
+      background: conic-gradient(var(--blue) 0 76%, #dbeaff 76% 100%);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .score-ring::before { content: ""; position: absolute; inset: 17px; border-radius: 50%; background: #fff; }
+    .score-ring span { position: relative; font-size: 34px; font-weight: 900; color: var(--blue); }
+    .score-ring small { display: block; font-size: 12px; color: var(--muted); font-weight: 700; }
+
+    .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 26px; }
+    .mini-card, .card, .metric, .quote, .note, .source-card {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      border-radius: 18px;
+    }
+    .mini-card { padding: 14px 15px; }
+    .mini-card span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    .mini-card b { font-size: 15px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .card { padding: 18px; }
+    .card p, .card li { color: #34475f; }
+    .card ul, .card ol { margin: 8px 0 0; padding-left: 20px; }
+
+    .metric { padding: 18px; background: linear-gradient(180deg, #fff, #f7fbff); }
+    .metric b { display: block; color: var(--blue); font-size: 28px; line-height: 1.06; letter-spacing: -.03em; margin-bottom: 8px; }
+    .metric span { display: block; color: var(--muted); font-size: 13px; }
+
+    .verdict-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .verdict-item { padding: 16px; border-radius: 18px; background: var(--surface-2); border: 1px solid var(--line); }
+    .verdict-item b { display: block; color: var(--deep); margin-bottom: 5px; }
+
+    .chart-card { padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(180deg, #ffffff, #f7fbff); }
+    .bar-row { display: grid; grid-template-columns: 160px 1fr 74px; align-items: center; gap: 12px; margin: 14px 0; }
+    .bar-label { color: #31445c; font-weight: 700; font-size: 13px; }
+    .bar-track { height: 12px; border-radius: 99px; background: #e7f0fb; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), #73b7ff); }
+    .bar-value { color: var(--blue); font-weight: 800; font-size: 13px; text-align: right; }
+
+    .case-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .case-card {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 14px 32px rgba(20,83,158,.08);
+    }
+    .case-visual {
+      height: 255px;
+      background: linear-gradient(145deg, #eaf4ff, #f9fcff);
+      display: grid;
+      place-items: end center;
+      position: relative;
+      padding-top: 18px;
+      overflow: hidden;
+    }
+    .case-visual::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: rgba(23,105,224,.11);
+      top: -70px;
+      right: -60px;
+    }
+    .phone-shot {
+      position: relative;
+      z-index: 1;
+      width: 132px;
+      height: 236px;
+      object-fit: cover;
+      border-radius: 22px 22px 0 0;
+      box-shadow: 0 16px 36px rgba(12,43,82,.22);
+      border: 6px solid #0b1d32;
+      border-bottom: 0;
+      background: #fff;
+    }
+    .icon-shot {
+      position: relative;
+      z-index: 1;
+      width: 90px;
+      height: 90px;
+      border-radius: 22px;
+      box-shadow: 0 14px 32px rgba(12,43,82,.18);
+    }
+    .case-body { padding: 17px; }
+    .case-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .app-icon { width: 42px; height: 42px; border-radius: 12px; flex: 0 0 auto; }
+    .case-head b { display: block; line-height: 1.2; }
+    .case-head span { color: var(--muted); font-size: 12px; }
+    .case-body p { color: #3e5067; font-size: 13.5px; }
+    .case-metric { margin-top: 12px; padding: 10px 11px; border-radius: 12px; background: var(--blue-3); color: var(--deep); font-size: 13px; font-weight: 700; }
+
+    .funnel { display: grid; gap: 10px; margin-top: 12px; }
+    .funnel-step { min-height: 54px; border-radius: 14px; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; font-weight: 750; }
+    .funnel-step:nth-child(1) { background: #1769e0; margin-right: 0; }
+    .funnel-step:nth-child(2) { background: #2180e8; margin-right: 7%; }
+    .funnel-step:nth-child(3) { background: #3397ee; margin-right: 14%; }
+    .funnel-step:nth-child(4) { background: #55aef2; margin-right: 21%; }
+    .funnel-step:nth-child(5) { background: #78c3f7; margin-right: 28%; color: #07345f; }
+
+    table { width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: #fff; margin-top: 12px; }
+    th, td { text-align: left; vertical-align: top; padding: 13px 14px; border-bottom: 1px solid var(--line); }
+    th { background: #f1f7ff; color: #415772; font-size: 12px; letter-spacing: .04em; }
+    tr:last-child td { border-bottom: 0; }
+    td { color: #34475f; }
+
+    .tag { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 9px; background: var(--blue-3); color: var(--blue); font-size: 12px; font-weight: 750; margin: 3px 4px 3px 0; }
+    .pill-good, .pill-warn, .pill-bad { display: inline-block; border-radius: 999px; padding: 3px 8px; font-size: 12px; font-weight: 800; }
+    .pill-good { color: var(--good); background: #e8f7f0; }
+    .pill-warn { color: var(--warn); background: #fff2df; }
+    .pill-bad { color: var(--bad); background: #ffecef; }
+
+    .quote { border-left: 5px solid var(--blue); padding: 18px 20px; background: #f5f9ff; color: #193a63; font-size: 17px; }
+    .note { padding: 14px 16px; background: #f8fbff; color: #40516a; }
+
+    .demo-wrap { display: grid; grid-template-columns: 330px 1fr; gap: 22px; align-items: center; }
+    .demo-phone {
+      width: 280px;
+      height: 560px;
+      border-radius: 42px;
+      padding: 14px;
+      background: #0a1830;
+      box-shadow: 0 24px 60px rgba(10,24,48,.22);
+      margin: 0 auto;
+    }
+    .demo-screen { height: 100%; border-radius: 30px; background: #f8fbff; overflow: hidden; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .demo-card { background: #fff; border: 1px solid #dce9fb; border-radius: 18px; padding: 14px; box-shadow: 0 10px 22px rgba(23,105,224,.08); }
+    .energy { height: 88px; background: linear-gradient(135deg, #1769e0, #7ec8ff); color: #fff; display: flex; flex-direction: column; justify-content: center; }
+    .chat { display: grid; gap: 8px; }
+    .bubble { max-width: 88%; border-radius: 14px; padding: 9px 11px; font-size: 12px; line-height: 1.45; }
+    .bubble.ai { background: #eaf4ff; color: #123b67; }
+    .bubble.me { background: #1769e0; color: #fff; justify-self: end; }
+
+    .roadmap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .phase { padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: linear-gradient(180deg, #fff, #f7fbff); position: relative; }
+    .phase::before { content: ""; position: absolute; left: 18px; top: 0; width: 44px; height: 4px; border-radius: 0 0 99px 99px; background: var(--blue); }
+    .phase b { color: var(--blue); }
+    .phase ul { margin: 8px 0 0; padding-left: 18px; color: #34475f; }
+
+    .source-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .source-card { padding: 14px; color: #3d516b; font-size: 13px; }
+    .small { color: var(--muted); font-size: 12.5px; }
+
+    @media (max-width: 1060px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; width: min(292px, calc(100vw - 36px)); transform: translateX(-105%); transition: transform .2s ease; box-shadow: var(--shadow); }
+      body.nav-open .sidebar { transform: translateX(0); }
+      body.sidebar-collapsed { --sidebar: 292px; }
+      body.sidebar-collapsed .brand-text, body.sidebar-collapsed .toc-text, body.sidebar-collapsed .sidebar-meta { opacity: 1; pointer-events: auto; }
+      .main { padding: 18px 16px 56px; }
+      .mobile-menu { display: inline-flex !important; }
+      .hero, .demo-wrap { grid-template-columns: 1fr; }
+      .meta-grid, .grid-3, .grid-4, .case-grid, .roadmap, .source-grid { grid-template-columns: 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 1061px) { .mobile-menu { display: none !important; } }
+    @media (max-width: 720px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .section, .hero { border-radius: 18px; padding: 22px; }
+      .verdict-strip, .meta-grid { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 1fr; gap: 6px; }
+      .bar-value { text-align: left; }
+      .case-visual { height: 220px; }
+      .demo-phone { width: 245px; height: 500px; }
+      table { display: block; overflow-x: auto; white-space: nowrap; }
+    }
+
+    @media print {
+      body { background: white; font-size: 12pt; }
+      .app-shell { display: block; }
+      .sidebar, .topbar { display: none; }
+      .main { padding: 0; }
+      .report { display: block; max-width: none; }
+      .section, .hero { box-shadow: none; border: 0; border-radius: 0; padding: 0; margin-bottom: 28px; break-inside: avoid; }
+      .case-card, .card, .metric, .chart-card, tr, li, .phase { break-inside: avoid; }
+      @page { margin: .72in; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="doc-brand">
+        <div class="brand-mark">PM</div>
+        <div class="brand-text">
+          <b>AI 灵性自我探索产品</b>
+          <span>市场可行性报告</span>
+        </div>
+      </div>
+      <button class="toggle-btn" id="collapseBtn" type="button">收起目录</button>
+      <ol class="toc-list" id="tocList">
+        <li><a href="#summary"><span class="toc-index">01</span><span class="toc-text">执行摘要</span></a></li>
+        <li><a href="#market"><span class="toc-index">02</span><span class="toc-text">市场规模</span></a></li>
+        <li><a href="#cases"><span class="toc-index">03</span><span class="toc-text">案例图库</span></a></li>
+        <li><a href="#model"><span class="toc-index">04</span><span class="toc-text">商业化模型</span></a></li>
+        <li><a href="#strategy"><span class="toc-index">05</span><span class="toc-text">产品策略</span></a></li>
+        <li><a href="#discovery"><span class="toc-index">06</span><span class="toc-text">用户探索</span></a></li>
+        <li><a href="#roadmap"><span class="toc-index">07</span><span class="toc-text">MVP 路线图</span></a></li>
+        <li><a href="#risk"><span class="toc-index">08</span><span class="toc-text">风险合规</span></a></li>
+        <li><a href="#sources"><span class="toc-index">09</span><span class="toc-text">资料来源</span></a></li>
+      </ol>
+      <div class="sidebar-meta">白色背景、蓝色辅助、模块化呈现；图片来自公开 App Store / 应用商店素材。</div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <button class="btn mobile-menu" id="mobileMenu" type="button">打开目录</button>
+          <span class="crumb">产品需求分析 / PM-Skills 完整分析 / 2026-06-29</span>
+        </div>
+        <div class="actions">
+          <button class="btn" onclick="window.scrollTo({top:0, behavior:'smooth'})">回到顶部</button>
+          <button class="btn primary" onclick="window.print()">打印 / 导出 PDF</button>
+        </div>
+      </div>
+
+      <article class="report">
+        <header class="hero" id="summary">
+          <div>
+            <div class="eyebrow">Market Feasibility Report</div>
+            <h1>AI 算命产品可行，但真正卖的是确定感、陪伴和自我解释</h1>
+            <p class="subtitle">建议避开“预测命运”的强承诺，定位为融合易经、星座、MBTI 与 AI 对话的“灵性自我探索 + 关系陪伴”产品。</p>
+            <div class="meta-grid">
+              <div class="mini-card"><span>总体判断</span><b>可做，但需换表达</b></div>
+              <div class="mini-card"><span>优先切口</span><b>关系合盘 + 每日能量卡</b></div>
+              <div class="mini-card"><span>商业模式</span><b>订阅 + 单次报告 + 咨询</b></div>
+              <div class="mini-card"><span>核心风险</span><b>合规、隐私、内容泛化</b></div>
+            </div>
+          </div>
+          <div class="hero-panel">
+            <div class="score-ring"><span>7.6<small>/ 10 可行性</small></span></div>
+            <div class="verdict-strip" style="grid-template-columns:1fr;">
+              <div class="verdict-item"><b>需求成立</b><span class="small">用户持续为关系确定性、自我认知、情绪陪伴付费。</span></div>
+              <div class="verdict-item"><b>案例已验证</b><span class="small">测测、万象有灵、Hint、Astra、AstroTalk 均有公开增长/收入线索。</span></div>
+              <div class="verdict-item"><b>关键胜负手</b><span class="small">长期陪伴能力，而不是一次性“玄学报告”。</span></div>
+            </div>
+          </div>
+        </header>
+
+        <section class="section">
+          <h2>结论总览</h2>
+          <div class="grid-3">
+            <div class="card"><h3>为什么可行</h3><p>星座、MBTI、塔罗、易经都承载“认识自己”和“获得确定感”的需求；AI 可将低频咨询转化为高频陪伴。</p></div>
+            <div class="card"><h3>为什么不能粗暴做</h3><p>直接叫“AI算命”会触发平台审核、信任、合规和品牌风险；更适合表达为娱乐、自我探索、关系沟通建议。</p></div>
+            <div class="card"><h3>第一阶段做什么</h3><p>从 H5/小程序验证“关系合盘、正缘画像、每日能量卡、个人底盘报告”的分享率、付费率和 D7 留存。</p></div>
+          </div>
+          <div class="quote" style="margin-top:16px;">产品承诺建议：不是“预测你的命运”，而是“用多套文化与人格模型，帮你在不确定时更好理解自己、关系与下一步行动”。</div>
+        </section>
+
+        <section class="section" id="market">
+          <h2>2. 市场规模与需求驱动</h2>
+          <div class="grid-3">
+            <div class="metric"><b>$10.53 亿</b><span>QYResearch 摘要：2024 年全球星座运势和占星术 App 市场规模；2031 年预计 $22.21 亿。</span></div>
+            <div class="metric"><b>$37.88 亿</b><span>Global Market Monitor：2024 年全球占星应用市场规模；2024-2033 CAGR 23.52%。</span></div>
+            <div class="metric"><b>$27.0 亿</b><span>Verified Market Research：2025 年在线人格测试市场规模；2033 年预计 $55.0 亿。</span></div>
+          </div>
+
+          <div class="grid-2" style="margin-top:18px;">
+            <div class="chart-card">
+              <h3>相邻市场机会强度</h3>
+              <div class="bar-row"><div class="bar-label">占星 / 运势 App</div><div class="bar-track"><div class="bar-fill" style="width:86%"></div></div><div class="bar-value">高</div></div>
+              <div class="bar-row"><div class="bar-label">人格测试 / MBTI</div><div class="bar-track"><div class="bar-fill" style="width:72%"></div></div><div class="bar-value">中高</div></div>
+              <div class="bar-row"><div class="bar-label">AI 情绪陪伴</div><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><div class="bar-value">高</div></div>
+              <div class="bar-row"><div class="bar-label">真人咨询平台</div><div class="bar-track"><div class="bar-fill" style="width:66%"></div></div><div class="bar-value">中高</div></div>
+            </div>
+            <div class="card">
+              <h3>增长驱动</h3>
+              <p><span class="tag">年轻用户社交货币</span><span class="tag">亲密关系焦虑</span><span class="tag">AI 个性化</span><span class="tag">心理健康与自我探索</span><span class="tag">小红书 / TikTok 传播</span></p>
+              <p style="margin-top:14px;">机会不在“算得准”，而在“表达得像我、安慰得及时、建议能行动、内容能分享”。</p>
+            </div>
+          </div>
+
+          <table>
+            <thead><tr><th>驱动因素</th><th>对产品的含义</th></tr></thead>
+            <tbody>
+              <tr><td>年轻用户对神秘学、星座、MBTI 的社交兴趣</td><td>适合做可分享报告、关系合盘、人格标签和年度预测。</td></tr>
+              <tr><td>亲密关系和职业焦虑</td><td>“他怎么看我”“我适合什么工作”“今年要不要换方向”是高付费意图问题。</td></tr>
+              <tr><td>AI 个性化内容生产</td><td>同一套知识体系可按用户资料、历史对话、语气偏好生成差异化内容。</td></tr>
+              <tr><td>社交媒体传播</td><td>“正缘画像”“今日能量卡”“关系合盘卡”天然适合分享。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="cases">
+          <h2>3. 产品案例图库与启示</h2>
+          <p style="color:var(--muted); margin-bottom:18px;">以下图片来自公开 App Store / 应用商店素材，用于说明同类产品的包装方式、视觉表达和商业化入口。</p>
+          <div class="case-grid">
+            <div class="case-card">
+              <div class="case-visual"><img class="phone-shot" src="assets/costar-screen.png" alt="Co-Star App 截图"></div>
+              <div class="case-body">
+                <div class="case-head"><img class="app-icon" src="assets/costar-icon.jpg" alt="Co-Star 图标"><div><b>Co-Star</b><span>AI + NASA data + Astrology</span></div></div>
+                <p>主打个性化占星和关系表达，曾披露约 3000 万用户，并完成约 $2100 万融资。</p>
+                <div class="case-metric">启示：品牌调性和社交关系解读是壁垒。</div>
+              </div>
+            </div>
+            <div class="case-card">
+              <div class="case-visual"><img class="phone-shot" src="assets/pattern-screen.jpg" alt="The Pattern App 截图"></div>
+              <div class="case-body">
+                <div class="case-head"><img class="app-icon" src="assets/pattern-icon.jpg" alt="The Pattern 图标"><div><b>The Pattern</b><span>Relationship & self insight</span></div></div>
+                <p>强调关系和自我洞察，不直接以“算命”表达，更接近心理化、生活化的解释工具。</p>
+                <div class="case-metric">启示：降低玄学感，提高自我探索感。</div>
+              </div>
+            </div>
+            <div class="case-card">
+              <div class="case-visual"><img class="phone-shot" src="assets/astra-screen.jpg" alt="Astra App 截图"></div>
+              <div class="case-body">
+                <div class="case-head"><img class="app-icon" src="assets/astra-icon.jpg" alt="Astra 图标"><div><b>Astra</b><span>Life Advice / Soulmate</span></div></div>
+                <p>以 Soulmate 画像和生命建议拉动下载，公开报道提到月收入稳定在约 $30 万。</p>
+                <div class="case-metric">启示：爆款钩子有效，但需长期留存机制。</div>
+              </div>
+            </div>
+            <div class="case-card">
+              <div class="case-visual"><img class="phone-shot" src="assets/astrotalk-screen.png" alt="AstroTalk App 截图"></div>
+              <div class="case-body">
+                <div class="case-head"><img class="app-icon" src="assets/astrotalk-icon.jpg" alt="AstroTalk 图标"><div><b>AstroTalk</b><span>真人占星咨询平台</span></div></div>
+                <p>连接用户与真人占星师，公开报道显示 FY24/FY25 收入和利润高速增长。</p>
+                <div class="case-metric">启示：真人咨询 marketplace 是高 ARPU 扩展方向。</div>
+              </div>
+            </div>
+            <div class="case-card">
+              <div class="case-visual"><img class="icon-shot" src="assets/cece-icon.jpg" alt="测测 App 图标"></div>
+              <div class="case-body">
+                <div class="case-head"><img class="app-icon" src="assets/cece-icon.jpg" alt="测测图标"><div><b>测测</b><span>星座 / MBTI / AI 问答社区</span></div></div>
+                <p>公开报道提到 DAU 超 100 万、注册用户超 5000 万；商业化包含会员、测测币、达人咨询。</p>
+                <div class="case-metric">启示：国内用户对“泛心理 + 星座 + 社区”接受度高。</div>
+              </div>
+            </div>
+            <div class="case-card">
+              <div class="case-visual"><img class="icon-shot" src="assets/wanxiang-icon.jpg" alt="万象有灵 App 图标"></div>
+              <div class="case-body">
+                <div class="case-head"><img class="app-icon" src="assets/wanxiang-icon.jpg" alt="万象有灵图标"><div><b>万象有灵</b><span>五行十神 + AI 陪伴</span></div></div>
+                <p>基于阴阳五行与十神体系的 AI 虚拟人格互动应用；公开报道称月收入超 30 万元。</p>
+                <div class="case-metric">启示：东方体系现代化表达已经有早期验证。</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="model">
+          <h2>4. 商业化模型：从好奇心到长期陪伴</h2>
+          <div class="grid-2">
+            <div class="chart-card">
+              <h3>推荐收入漏斗</h3>
+              <div class="funnel">
+                <div class="funnel-step"><span>免费入口</span><span>每日卡 / 基础报告</span></div>
+                <div class="funnel-step"><span>单次付费</span><span>¥9.9–¥99</span></div>
+                <div class="funnel-step"><span>订阅会员</span><span>¥19.9–¥39.9/月</span></div>
+                <div class="funnel-step"><span>专家咨询</span><span>¥99–¥399/次</span></div>
+                <div class="funnel-step"><span>课程 / 数字商品</span><span>复购扩展</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>建议价格带</h3>
+              <table>
+                <tbody>
+                  <tr><td>国内订阅</td><td>¥19.9–¥39.9 / 月</td></tr>
+                  <tr><td>国内单次报告</td><td>¥9.9–¥99</td></tr>
+                  <tr><td>真人咨询</td><td>¥99–¥399 / 次，平台抽佣 20%–40%</td></tr>
+                  <tr><td>海外订阅</td><td>$9.99–$29.99 / 月</td></tr>
+                  <tr><td>海外小额解锁</td><td>$0.99–$4.99 / 次</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <table>
+            <thead><tr><th>阶段</th><th>MAU 假设</th><th>付费假设</th><th>月收入粗算</th><th>目标</th></tr></thead>
+            <tbody>
+              <tr><td>冷启动验证</td><td>10,000</td><td>8% 单次付费 × ¥19.9；1% 订阅 × ¥29.9</td><td>约 ¥1.9 万</td><td>验证钩子、报告价值、复访意愿</td></tr>
+              <tr><td>早期 PMF</td><td>100,000</td><td>12% 单次付费 × ¥19.9；2% 订阅 × ¥29.9</td><td>约 ¥29.9 万</td><td>接近万象有灵公开月收入量级</td></tr>
+              <tr><td>规模化增长</td><td>500,000</td><td>15% 单次付费 × ¥19.9；3% 订阅 × ¥29.9</td><td>约 ¥194 万</td><td>建设咨询 marketplace 与品牌矩阵</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="strategy">
+          <h2>5. 产品战略与差异化</h2>
+          <div class="quote">建议定位：一款融合东方命理、西方星座与人格心理模型的 AI 自我探索与关系陪伴产品。</div>
+          <div class="grid-2" style="margin-top:16px;">
+            <div class="card">
+              <h3>目标用户</h3>
+              <ul>
+                <li><strong>核心：</strong>18–35 岁女性，一二线城市，关注情感关系、自我成长、星座/MBTI。</li>
+                <li><strong>扩展：</strong>职场转型期、分手疗愈期、人生节点焦虑用户。</li>
+                <li><strong>海外：</strong>对 astrology、tarot、self-discovery、relationship advice 感兴趣的用户。</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>价值主张</h3>
+              <ul>
+                <li>不是“告诉你命运”，而是“帮你整理不确定”。</li>
+                <li>不是“泛泛星座文案”，而是结合出生信息、MBTI、历史对话和情绪记录。</li>
+                <li>不是“一次性报告”，而是长期陪伴、复盘与行动建议。</li>
+              </ul>
+            </div>
+          </div>
+
+          <table>
+            <thead><tr><th>差异化抓手</th><th>说明</th><th>竞争价值</th></tr></thead>
+            <tbody>
+              <tr><td>多体系融合解释引擎</td><td>易经/五行/八字、星座、MBTI、塔罗之间给出一致性、冲突点和解释置信度。</td><td>区别于单一星座 App 和模板化 AI ChatBot。</td></tr>
+              <tr><td>长期记忆与周期复盘</td><td>记录用户关系事件、情绪波动、关键选择，每周/月生成复盘。</td><td>提升复访和订阅价值。</td></tr>
+              <tr><td>仪式感 + 行动建议</td><td>每日能量卡、今日宜忌、关系沟通建议、职业小行动。</td><td>从内容消费转为行为引导。</td></tr>
+              <tr><td>分享型视觉报告</td><td>正缘画像、人格宇宙图、年度关键词、关系合盘卡。</td><td>降低获客成本。</td></tr>
+              <tr><td>专家审核/入驻</td><td>高价报告和咨询引入真人校对或服务。</td><td>提高信任与 ARPU。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="discovery">
+          <h2>6. 用户探索：需求、假设与验证</h2>
+          <div class="grid-3">
+            <div class="card"><h3>Job 1：关系确定性</h3><p>当我对某段关系不确定时，我想得到一个解释框架和沟通建议，让自己没那么焦虑。</p><p><span class="tag">合盘</span><span class="tag">正缘画像</span><span class="tag">复合可能性</span></p></div>
+            <div class="card"><h3>Job 2：自我理解</h3><p>当我觉得迷茫时，我想知道自己的性格、周期和优势，从而获得自我叙事。</p><p><span class="tag">MBTI</span><span class="tag">五行人格</span><span class="tag">年度关键词</span></p></div>
+            <div class="card"><h3>Job 3：行动安慰</h3><p>当我不知道下一步怎么做时，我想要温和、具体、不评判的建议。</p><p><span class="tag">今日宜忌</span><span class="tag">职业建议</span><span class="tag">情绪陪伴</span></p></div>
+          </div>
+          <table>
+            <thead><tr><th>假设</th><th>验证方式</th><th>成功信号</th></tr></thead>
+            <tbody>
+              <tr><td>用户愿意为“关系/正缘/合盘”报告付费。</td><td>落地页 + 9.9/19.9 元预售 + 小红书投放测试。</td><td>访问到付费转化 ≥ 3%，报告完读率 ≥ 60%。</td></tr>
+              <tr><td>东方命理融合星座/MBTI 能形成差异化。</td><td>A/B 测试单一星座版 vs 融合版报告。</td><td>融合版分享率、收藏率、复访率显著更高。</td></tr>
+              <tr><td>长期陪伴能支撑订阅。</td><td>7 天每日能量卡 + AI 对话跟进。</td><td>D7 留存 ≥ 18%，订阅试用转化 ≥ 2%。</td></tr>
+              <tr><td>真人/专家服务能提高 ARPU。</td><td>提供 AI 报告 + 专家解读加购。</td><td>加购率 ≥ 5%，客单价 ≥ ¥99。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section">
+          <h2>7. Demo 概念：第一版应该长什么样</h2>
+          <div class="demo-wrap">
+            <div class="demo-phone" aria-label="产品 Demo 概念图">
+              <div class="demo-screen">
+                <div class="demo-card energy"><b>今日能量卡</b><span>水木相生：适合沟通与整理关系边界</span></div>
+                <div class="demo-card"><b>你的底盘画像</b><p class="small">月亮双鱼 × INFP × 印星偏旺：高共情、易内耗、需要稳定节律。</p></div>
+                <div class="demo-card chat">
+                  <div class="bubble ai">今天你更需要确认感，而不是答案。先问自己：我想被怎样回应？</div>
+                  <div class="bubble me">我想知道他是不是还在乎我。</div>
+                  <div class="bubble ai">我们可以从合盘的沟通模式看，但不要把它当成结论。</div>
+                </div>
+                <div class="demo-card"><b>关系合盘</b><p class="small">解锁完整报告：¥19.9</p></div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="card"><h3>核心体验</h3><ul><li>底盘画像：出生信息 + MBTI + 五行人格。</li><li>每日能量卡：高频复访入口。</li><li>AI 灵性顾问：情绪陪伴 + 行动建议。</li><li>关系合盘：首个高转化付费点。</li></ul></div>
+              <div class="card"><h3>表达原则</h3><ul><li>用“倾向、提醒、建议”，不用绝对断言。</li><li>用“自我探索”，不用“改命承诺”。</li><li>涉及健康、投资、法律时主动降级为一般提醒。</li><li>所有敏感数据允许删除和导出。</li></ul></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="roadmap">
+          <h2>8. MVP、指标与路线图</h2>
+          <div class="grid-2">
+            <div class="card"><h3>第一版必须有</h3><ul><li>出生信息 + MBTI/性格问卷 onboarding。</li><li>个人底盘报告：五行人格、星座人格、MBTI 交叉解读。</li><li>每日能量卡：情绪、关系、事业、行动建议。</li><li>AI 灵性顾问对话：限制次数，支持长期记忆。</li><li>关系合盘 / 正缘画像：首个付费钩子。</li><li>分享卡：适合小红书、朋友圈、社群传播。</li></ul></div>
+            <div class="card"><h3>第一版不要做</h3><ul><li>不要一开始做大而全的命理百科。</li><li>不要承诺准确预测财富、疾病、婚姻结果。</li><li>不要用强诱导订阅或隐藏退订。</li><li>不要过早做复杂社区，先验证内容和付费。</li><li>不要让 AI 在医疗、法律、投资等领域给确定性建议。</li></ul></div>
+          </div>
+          <div class="roadmap" style="margin-top:18px;">
+            <div class="phase"><b>0–4 周</b><ul><li>Landing page</li><li>三类报告原型</li><li>付费预售测试</li></ul></div>
+            <div class="phase"><b>1–3 月</b><ul><li>MVP App/H5</li><li>每日卡 + AI 对话</li><li>单次报告付费</li></ul></div>
+            <div class="phase"><b>3–6 月</b><ul><li>订阅体系</li><li>长期记忆</li><li>关系复盘</li></ul></div>
+            <div class="phase"><b>6–12 月</b><ul><li>专家入驻</li><li>海外版</li><li>品牌联名与课程</li></ul></div>
+          </div>
+          <table>
+            <thead><tr><th>层级</th><th>指标</th><th>目标含义</th></tr></thead>
+            <tbody>
+              <tr><td>北极星</td><td>每周获得有效自我/关系洞察的活跃用户数</td><td>避免只追求占卜次数，强调“有效洞察”。</td></tr>
+              <tr><td>激活</td><td>完成底盘报告率、首次对话率、首次分享率</td><td>验证 onboarding 与第一印象。</td></tr>
+              <tr><td>留存</td><td>D1/D7/D30、每日卡连续打开天数</td><td>验证长期陪伴价值。</td></tr>
+              <tr><td>变现</td><td>报告购买率、订阅转化率、ARPPU、退款率</td><td>验证商业化质量。</td></tr>
+              <tr><td>口碑</td><td>分享率、转介绍率、投诉率、退订成功率</td><td>这类产品尤其依赖信任。</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="section" id="risk">
+          <h2>9. 风险、合规与最终建议</h2>
+          <table>
+            <thead><tr><th>风险</th><th>等级</th><th>应对建议</th></tr></thead>
+            <tbody>
+              <tr><td>迷信/虚假宣传风险</td><td><span class="pill-bad">高</span></td><td>定位为娱乐、自我探索和情绪支持；避免绝对化预测；所有报告加免责声明。</td></tr>
+              <tr><td>隐私与敏感数据</td><td><span class="pill-bad">高</span></td><td>出生时间地点、关系、情绪数据要最小化采集、加密存储、允许删除和导出。</td></tr>
+              <tr><td>订阅投诉</td><td><span class="pill-warn">中高</span></td><td>价格透明、退订清晰、试用到期提醒；不要复制海外灰色订阅套路。</td></tr>
+              <tr><td>内容泛化导致留存低</td><td><span class="pill-warn">中</span></td><td>引入长期记忆、用户事件、行动反馈闭环，而不是只生成模板报告。</td></tr>
+              <tr><td>平台审核和投放限制</td><td><span class="pill-warn">中</span></td><td>广告用“性格洞察/关系沟通/自我探索”，少用“改命、发财、预测疾病”等表达。</td></tr>
+              <tr><td>伦理边界</td><td><span class="pill-warn">中</span></td><td>遇到自伤、疾病、极端关系控制等场景，转为安全支持和求助建议。</td></tr>
+            </tbody>
+          </table>
+          <div class="quote" style="margin-top:16px;">最终建议：可以立项，但建议从 H5/小程序 + 付费报告 MVP 开始，而不是直接做重 App。优先验证分享率、深度报告付费率和 7 天复访。</div>
+        </section>
+
+        <section class="section" id="sources">
+          <h2>10. 资料来源与备注</h2>
+          <div class="source-grid">
+            <div class="source-card"><b>QYResearch / 格隆汇</b><br><a href="https://m.gelonghui.com/p/2361507">星座运势和占星术 App 市场摘要</a></div>
+            <div class="source-card"><b>Global Market Monitor</b><br><a href="https://www.globalmarketmonitor.com.cn/market_news/2937080.html">全球占星应用市场收入与份额洞察</a></div>
+            <div class="source-card"><b>Verified Market Research</b><br><a href="https://www.verifiedmarketresearch.com/product/online-personality-test-market/">Online Personality Test Market</a></div>
+            <div class="source-card"><b>晚点 LatePost / 大数跨境</b><br><a href="https://www.10100.com/article/4950096">测测 App 案例</a></div>
+            <div class="source-card"><b>创业邦 / 腾讯新闻</b><br><a href="https://new.qq.com/rain/a/20260618A05LML00">万象有灵案例</a></div>
+            <div class="source-card"><b>AI 新榜 / 腾讯新闻</b><br><a href="https://new.qq.com/rain/a/20260616A06ZM800">Hint.app 深度体验</a></div>
+            <div class="source-card"><b>白鲸出海 / 36氪</b><br><a href="https://m.36kr.com/p/3589763196780548">Hint、Starla、Astra 商业化</a></div>
+            <div class="source-card"><b>乌鸦智能说 / 腾讯新闻</b><br><a href="https://new.qq.com/rain/a/20250714A07TVG00">AI 算姻缘产品案例</a></div>
+          </div>
+          <p class="note" style="margin-top:16px;">说明：本报告不是法律、医疗、心理治疗或投资建议。涉及收入、流量、市场规模的数据多来自第三方估算，建议用于方向判断，而非财务承诺。</p>
+        </section>
+      </article>
+    </main>
+  </div>
+
+  <script>
+    const body = document.body;
+    const collapseBtn = document.getElementById('collapseBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const tocLinks = Array.from(document.querySelectorAll('#tocList a'));
+    const sections = tocLinks.map(link => document.querySelector(link.getAttribute('href'))).filter(Boolean);
+
+    collapseBtn.addEventListener('click', () => {
+      if (window.matchMedia('(max-width: 1060px)').matches) {
+        body.classList.toggle('nav-open');
+        return;
+      }
+      body.classList.toggle('sidebar-collapsed');
+      collapseBtn.textContent = body.classList.contains('sidebar-collapsed') ? '展开' : '收起目录';
+    });
+
+    mobileMenu.addEventListener('click', () => body.classList.add('nav-open'));
+    tocLinks.forEach(link => link.addEventListener('click', () => body.classList.remove('nav-open')));
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        tocLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id));
+      });
+    }, { rootMargin: '-25% 0px -65% 0px', threshold: 0.01 });
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>
